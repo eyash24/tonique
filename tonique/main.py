@@ -20,9 +20,8 @@ def hello():
 
 class Person:
     
-    def __init__(self, name, pid, payment_done=0, expense=0, grp=None):
+    def __init__(self, name, payment_done=0, expense=0, grp=None):
         self.name = name
-        self.pid = pid
         self.payment_done = payment_done
         self.expense = expense
         self.grp = grp
@@ -92,7 +91,7 @@ class Group:
         return (202, f'Member {member.get_name()} successfully added in Group {self.name}')
     
     def remove_member(self, member):
-        # check if member owes or is owed any money
+        # check if member owe or is owed any money
         if member.check_pending() == 0:
             # moving forward with removal
             self.members.remove(member)
@@ -168,11 +167,14 @@ class Group:
                         receive_amount = receive_amount - amount_pay
         else:
             # recieve does not match with pay
-            return (405, f'Receive does not match with pay for Group {self.name}')
+            return (405, f'Receive does not match with Pay for Group {self.name}')
 
         return transaction_record
 
 
+class App:
+    def __init__(self):
+        pass
 
                 
                 
