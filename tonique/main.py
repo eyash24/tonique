@@ -1,6 +1,8 @@
 # TODO: improve the status codes and make a note of this in README.md file 
 # TODO: Create a display function showcasing a matrix type display
 
+from typing import List
+
 '''
 Docstring for tonique.main
 
@@ -19,12 +21,13 @@ def hello():
     print("Hello from tonique app!")
 
 class Person:
+    # Group Level
     
-    def __init__(self, name, payment_done=0, expense=0, grp=None):
+    def __init__(self, name, pid, payment_done=0, expense=0):
+        self.pid = pid
         self.name = name
         self.payment_done = payment_done
         self.expense = expense
-        self.grp = grp
 
     def update_payment_done(self, add_amount):
         self.payment_done += add_amount
@@ -43,12 +46,36 @@ class Person:
     
     def get_expense(self):
         return self.expense
+    
+    def get_name(self):
+        return self.name
 
-    def add_grp(self, grp):
+    def update_name(self, name):
+        old_name = self.name
+        self.name = name
+        return (202, f'Member name changes successful from {old_name} to {self.name}.')
+
+    def get_pid(self):
+        return self.pid
+
+
+class GroupMember(Person):
+    ## App level
+
+    def __init__(self, name, payment_done=0, expense=0, grp=None):
+        super().__init__(name, payment_done, expense)
+        # grp is a dictionary key: grp object, value : Person Object
+        self.grp = grp
+    
+    def get_grp(self):
+        return self.grp
+
+    def add_grp(self, grp, pid):
         if self.grp is None:
-            self.grp = [grp]
+            self.grp = dict()
+            self.grp[grp] = pid
         else:
-            self.grp.append(grp)
+            self.grp[grp] = pid
         return (202, f'Person {self.name} aligned with Group {grp.get_name()}')
     
     def remove_grp(self, grp):
@@ -59,21 +86,24 @@ class Person:
             return (405, f'Group {grp.get_name()} not aligned with Person {self.name}')
         
         else:
-            self.grp.remove(grp)
-            return (202, f'Person {self.name} successfully unaligned from Group {grp.get_name()}')
-    
-    def get_name(self):
-        return self.name
+            # remove from desired group only if they dont owe anyone or are owed any money from any other group member
+            grp_member = self.grp[grp]
+            # if grp_member.check_pending == 0:
+            #     # safe to remove    
+            #     self.grp.pop(grp)
+            #     return (202, f'Person {self.name} successfully unaligned from Group {grp.get_name()}')
 
-    def update_name(self, name):
-        old_name = self.name
-        self.name = name
-        return (202, f'Member name changes successful from {old_name} to {self.name}.')
-
+            # else:
+            #     # not safe to remove said member from grp
+            #     return (405, f'Member {self.name} has pending amount {grp_member.check_pending()} in Group {grp.get_name()}')
         
+            # OR
+            return grp.remove_member(grp_member)
+
+     
 class Group:
 
-    def __init__(self, name, members):
+    def __init__(self, name: str, members: List[GroupMember]):
         self.name = name
         self.members = members
     
