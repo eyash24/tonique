@@ -1,1 +1,1 @@
-from .main import hello, Person, Group
+from .expense import Person, Group

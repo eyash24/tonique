@@ -6,19 +6,19 @@ from typing import List
 '''
 Docstring for tonique.main
 
-Function response format 
+Function response format: 
 ( status code, status message custom to each function )
 '''
 
-
-def total_sum(li):
-    res = 0
-    for l in li:
-        res += l[0]
-    return res
-
 def hello():
     print("Hello from tonique app!")
+
+def total_sum(li, index=0):
+    print(li)
+    res = 0
+    for l in li:
+        res += l[index]
+    return res
 
 class Person:
     # Group Level
@@ -59,7 +59,7 @@ class Person:
         return self.pid
 
 
-class GroupMember(Person):
+class GroupPerson(Person):
     ## App level
 
     def __init__(self, name, payment_done=0, expense=0, grp=None):
@@ -100,10 +100,10 @@ class GroupMember(Person):
             # OR
             return grp.remove_member(grp_member)
 
-     
+
 class Group:
 
-    def __init__(self, name: str, members: List[GroupMember]):
+    def __init__(self, name: str, members: List[Person]):
         self.name = name
         self.members = members
     
@@ -142,13 +142,23 @@ class Group:
             share = amount / len(split_grp)
             for person in split_grp:
                 person.update_expense(share)
+            return (202, f'Expense updated for Group {self.name}.')
         
         else:
-            for person, share in split_unequally:
-                person.update_expense(share)
+            # sum of shares
+            sum_shares = total_sum(split_unequally, index=1)
+            if amount == sum_shares:
+                # proceed forward
+                for person, share in split_unequally:
+                    person.update_expense(share)
+                return (202, f'Expense updated for Group {self.name}.')
+            
+            else:
+                return (405, f'Sum of expense split not matching with total amount.')
+
 
     def balance(self):
-        pendings = [ (member.check_pending(), member) for member in self.members ]
+        pendings = [ [member.check_pending(), member] for member in self.members ]
 
         # TODO: build a min heap and max heap for faster min and max record amount 
         # TODO: draft of the working w/o using heap -> use sort methods instead
@@ -164,14 +174,16 @@ class Group:
             elif acct[0] > 0: # more ammount paid then the expense 
                 recieve.append(acct)
             else: # expense is more than what they have paid
-                pay.append(-1*acct)
+                new_pending = acct
+                new_pending[0] *= -1
+                pay.append(acct)
         
         # sorting each list
         recieve.sort(reverse=True)
         pay.sort()
         
-        # transaction record list of (from, amount, to)
-        transaction_record = list()
+        # split record list of (to, amount, from)
+        split_record = list()
 
         if total_sum(recieve) == total_sum(pay):
             # total recieve matches total pay
@@ -182,42 +194,26 @@ class Group:
                     (amount_pay, person_paying) = pay.pop(0)
                     
                     if receive_amount < amount_pay:
-                        transaction_record.append((person_receive, receive_amount, person_paying))
+                        split_record.append((person_receive, receive_amount, person_paying))
                         # append surplus of amount_pay back to pay list 
                         pay.append((amount_pay - receive_amount, person_paying))
                         break # exit while loop
                     
                     elif receive_amount == amount_pay:
-                        transaction_record.append((person_receive, amount_pay, person_paying))
+                        split_record.append((person_receive, amount_pay, person_paying))
                         break
 
                     elif receive_amount > amount_pay:
                         # need more funds
-                        transaction_record.append((person_receive, amount_pay, person_paying))
+                        split_record.append((person_receive, amount_pay, person_paying))
                         receive_amount = receive_amount - amount_pay
         else:
             # recieve does not match with pay
             return (405, f'Receive does not match with Pay for Group {self.name}')
 
-        return transaction_record
+        return split_record
 
 
 class App:
     def __init__(self):
         pass
-
-                
-                
-
-
-
-
-
-
-        
-
-
-
-
-
-        
