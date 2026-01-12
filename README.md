@@ -1,5 +1,9 @@
 # Tonique
 
+Follow the below youtube video link:
+Link: https://youtu.be/Kz6IlDCyOUY?si=lFkpBFNhz6LJjAQ_
+
+
 ## Building packages
 '''
 python setup.py sdist bdist wheel
