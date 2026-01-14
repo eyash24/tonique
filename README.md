@@ -1,7 +1,7 @@
 # Tonique
 
 ## About 
-The package, 'Tonique' consist of toolsets that can be used to undertake several day to day operations. It was made to make the task easier to perform and not go towards any other application to undertake it. 
+The package, **'Tonique'** consist of toolsets that can be used to undertake several day to day operations. It was made to make the task easier to perform and not go towards any other application to undertake it. 
 
 ## Module Information
 It consist of several modules with apt name for the task they can perform. Following are the modules and their use cases:
