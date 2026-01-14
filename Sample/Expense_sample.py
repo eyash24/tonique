@@ -1,4 +1,5 @@
 from tonique import Person, Group
+
 pid = 100
 p_a = Person('A', pid=pid)
 p_b = Person('B', pid=pid+1)
