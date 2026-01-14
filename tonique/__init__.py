@@ -1,1 +1,1 @@
-from .expense import Person, Group, GroupPerson
+from .expense import *
